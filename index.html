@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>School Voting System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f7f7f7;
+    }
+    header {
+      background: linear-gradient(to right, #2196F3, #4CAF50);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 26px;
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px white; }
+      to { text-shadow: 0 0 15px yellow; }
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    label, input, select {
+      display: block;
+      margin: 10px 0;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+    .candidates {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .candidate {
+      background: #eee;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+      text-align: center;
+      width: 160px;
+    }
+    .candidate img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0b7dda;
+    }
+    .admin-btn {
+      background: #d32f2f;
+    }
+    .admin-panel {
+      display: none;
+      text-align: center;
+    }
+    .hidden { display: none; }
+    .candidate-form {
+      background: #f0f0f0;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>School Voting System</header>
+
+<div class="container" id="voting-container">
+  <h2>Voter Details</h2>
+  <label>Name: <input id="name" /></label>
+  <label>Age: <input id="age" type="number" /></label>
+  <label>Aadhaar (last 4 digits): <input id="aadhaar" maxlength="4" /></label>
+  <label>Class: <input id="class" /></label>
+  <label>Section:</label>
+  <div class="radio-group">
+    <label><input type="radio" name="section" value="Shine" /> Shine</label>
+    <label><input type="radio" name="section" value="Bright" /> Bright</label>
+  </div>
+  <label>Gender:</label>
+  <div class="radio-group">
+    <label><input type="radio" name="gender" value="Male" /> Male</label>
+    <label><input type="radio" name="gender" value="Female" /> Female</label>
+  </div>
+
+  <h3 id="stage-title">Vote for Head Boy</h3>
+  <div class="candidates" id="candidates-box"></div>
+
+  <button class="admin-btn" onclick="showAdminPanel()">Admin Panel</button>
+</div>
+
+<div class="container admin-panel" id="admin-panel">
+  <h2>Admin Login</h2>
+  <input id="admin-pass" placeholder="Enter Admin Password" type="password"/>
+  <button onclick="checkAdmin()">View Results</button>
+  <div id="results" style="margin-top: 20px; white-space: pre-line;"></div>
+  <button id="change-btn" class="hidden" onclick="showChangeCandidates()">Change Candidates</button>
+</div>
+
+<div class="container hidden" id="candidate-change-section">
+  <h2>Change Candidates</h2>
+  <label>Number of Head Boy Candidates: <input id="boy-count" type="number"></label>
+  <label>Number of Head Girl Candidates: <input id="girl-count" type="number"></label>
+  <button onclick="buildCandidateForms()">Next</button>
+  
+  <div id="candidate-forms"></div>
+  <button onclick="saveNewCandidates()">Save New Candidates</button>
+</div>
+
+<script>
+  const ADMIN_PASSWORD = "Kshitiz";
+  let headBoy = { "Aryan": 0, "Kunal": 0 };
+  let headGirl = { "Priya": 0, "Anjali": 0 };
+  let images = {
+    "Aryan": "https://via.placeholder.com/100?text=Aryan",
+    "Kunal": "https://via.placeholder.com/100?text=Kunal",
+    "Priya": "https://via.placeholder.com/100?text=Priya",
+    "Anjali": "https://via.placeholder.com/100?text=Anjali"
+  };
+
+  let stage = "head_boy";
+  let currentAadhaar = null;
+  const votedAadhaars = new Set();
+
+  function buildCandidates() {
+    const box = document.getElementById("candidates-box");
+    box.innerHTML = "";
+    const list = stage === "head_boy" ? headBoy : headGirl;
+    for (const name in list) {
+      const div = document.createElement("div");
+      div.className = "candidate";
+      div.innerHTML = `<img src='${images[name]}'/><p>${name}</p><button onclick="vote('${name}')">Vote</button>`;
+      box.appendChild(div);
+    }
+    document.getElementById("stage-title").innerText = "Vote for " + (stage === "head_boy" ? "Head Boy" : "Head Girl");
+  }
+
+  function vote(name) {
+    const voterName = document.getElementById("name").value.trim();
+    const age = parseInt(document.getElementById("age").value);
+    const aadhaar = document.getElementById("aadhaar").value.trim();
+    const cls = document.getElementById("class").value.trim();
+    const section = document.querySelector("input[name='section']:checked");
+    const gender = document.querySelector("input[name='gender']:checked");
+
+    if (!voterName || isNaN(age) || !aadhaar || !cls || !section || !gender) {
+      alert("Please fill all fields.");
+      return;
+    }
+    if (aadhaar.length !== 4 || isNaN(aadhaar)) {
+      alert("Aadhaar must be 4 digits.");
+      return;
+    }
+    if (age < 11) {
+      alert("You must be at least 11 years old to vote.");
+      return;
+    }
+
+    if (stage === "head_boy") {
+      if (votedAadhaars.has(aadhaar)) {
+        alert("This Aadhaar has already voted.");
+        return;
+      }
+      headBoy[name]++;
+      currentAadhaar = aadhaar;
+      stage = "head_girl";
+      buildCandidates();
+      alert("Vote recorded for Head Boy. Now vote for Head Girl.");
+    } else {
+      if (aadhaar !== currentAadhaar) {
+        alert("Please use the same Aadhaar to vote for Head Girl.");
+        return;
+      }
+      headGirl[name]++;
+      votedAadhaars.add(aadhaar);
+      alert("Thank you! Your vote has been recorded.");
+      ["name", "age", "aadhaar", "class"].forEach(id => document.getElementById(id).value = "");
+      document.querySelectorAll("input[name='section']").forEach(i => i.checked = false);
+      document.querySelectorAll("input[name='gender']").forEach(i => i.checked = false);
+      stage = "head_boy";
+      buildCandidates();
+    }
+  }
+
+  function showAdminPanel() {
+    document.getElementById("admin-panel").style.display = "block";
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  function checkAdmin() {
+    const pass = document.getElementById("admin-pass").value;
+    if (pass !== ADMIN_PASSWORD) {
+      alert("Incorrect password.");
+      return;
+    }
+    let result = "Voting Results\n\nHead Boy:\n";
+    const maxBoy = Math.max(...Object.values(headBoy));
+    const winnersBoy = [];
+    for (const [k,v] of Object.entries(headBoy)) {
+      result += `${k}: ${v} votes\n`;
+      if (v === maxBoy) winnersBoy.push(k);
+    }
+    result += `\nWinner(s): ${winnersBoy.join(', ')}\n\nHead Girl:\n`;
+    const maxGirl = Math.max(...Object.values(headGirl));
+    const winnersGirl = [];
+    for (const [k,v] of Object.entries(headGirl)) {
+      result += `${k}: ${v} votes\n`;
+      if (v === maxGirl) winnersGirl.push(k);
+    }
+    result += `\nWinner(s): ${winnersGirl.join(', ')}`;
+    document.getElementById("results").innerText = result;
+    document.getElementById("change-btn").classList.remove("hidden");
+  }
+
+  function showChangeCandidates() {
+    document.getElementById("candidate-change-section").classList.remove("hidden");
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  function buildCandidateForms() {
+    const boys = parseInt(document.getElementById("boy-count").value);
+    const girls = parseInt(document.getElementById("girl-count").value);
+    const formBox = document.getElementById("candidate-forms");
+    formBox.innerHTML = "<h3>Head Boy Candidates</h3>";
+    for (let i = 0; i < boys; i++) {
+      formBox.innerHTML += `
+        <div class="candidate-form">
+          <label>Name: <input class="boy-name" /></label>
+          <label>Photo: <input type="file" class="boy-img" accept="image/*" /></label>
+        </div>`;
+    }
+    formBox.innerHTML += "<h3>Head Girl Candidates</h3>";
+    for (let i = 0; i < girls; i++) {
+      formBox.innerHTML += `
+        <div class="candidate-form">
+          <label>Name: <input class="girl-name" /></label>
+          <label>Photo: <input type="file" class="girl-img" accept="image/*" /></label>
+        </div>`;
+    }
+  }
+
+  function saveNewCandidates() {
+    headBoy = {};
+    headGirl = {};
+    images = {};
+    const boyNames = document.querySelectorAll(".boy-name");
+    const boyImgs = document.querySelectorAll(".boy-img");
+    for (let i = 0; i < boyNames.length; i++) {
+      const name = boyNames[i].value.trim();
+      const file = boyImgs[i].files[0];
+      if (name && file) {
+        headBoy[name] = 0;
+        images[name] = URL.createObjectURL(file);
+      }
+    }
+    const girlNames = document.querySelectorAll(".girl-name");
+    const girlImgs = document.querySelectorAll(".girl-img");
+    for (let i = 0; i < girlNames.length; i++) {
+      const name = girlNames[i].value.trim();
+      const file = girlImgs[i].files[0];
+      if (name && file) {
+        headGirl[name] = 0;
+        images[name] = URL.createObjectURL(file);
+      }
+    }
+    alert("Candidates updated!");
+    stage = "head_boy";
+    buildCandidates();
+    document.getElementById("candidate-change-section").classList.add("hidden");
+  }
+
+  buildCandidates();
+</script>
+
+</body>
+</html>
