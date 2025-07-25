@@ -124,6 +124,7 @@
   <button onclick="checkAdmin()">View Results</button>
   <div id="results" style="margin-top: 20px; white-space: pre-line;"></div>
   <button id="change-btn" class="hidden" onclick="showChangeCandidates()">Change Candidates</button>
+  <button onclick="exitAdminPanel()">Exit Admin Panel</button>
 </div>
 
 <div class="container hidden" id="candidate-change-section">
@@ -138,11 +139,11 @@
 
 <script>
   const ADMIN_PASSWORD = "Kshitiz";
-  let headBoy = { "Aryan": 0, "Kunal": 0 };
+  let headBoy = { "Aryan": 0, "Adarsh": 0 };
   let headGirl = { "Priya": 0, "Anjali": 0 };
   let images = {
     "Aryan": "https://via.placeholder.com/100?text=Aryan",
-    "Kunal": "https://via.placeholder.com/100?text=Kunal",
+    "Adarsh": "https://via.placeholder.com/100?text=Adarsh",
     "Priya": "https://via.placeholder.com/100?text=Priya",
     "Anjali": "https://via.placeholder.com/100?text=Anjali"
   };
@@ -222,6 +223,7 @@
       alert("Incorrect password.");
       return;
     }
+
     let result = "Voting Results\n\nHead Boy:\n";
     const maxBoy = Math.max(...Object.values(headBoy));
     const winnersBoy = [];
@@ -239,6 +241,13 @@
     result += `\nWinner(s): ${winnersGirl.join(', ')}`;
     document.getElementById("results").innerText = result;
     document.getElementById("change-btn").classList.remove("hidden");
+  }
+
+  function exitAdminPanel() {
+    document.getElementById("admin-panel").style.display = "none";
+    document.getElementById("admin-pass").value = "";
+    document.getElementById("results").innerText = "";
+    document.getElementById("change-btn").classList.add("hidden");
   }
 
   function showChangeCandidates() {
