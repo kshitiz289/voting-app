@@ -1,4 +1,4 @@
-const ADMIN_PASSWORD = "Kshitiz";
+const ADMIN_PASSWORD = "password";
   let headBoy = { "Aryan": 0, "Adarsh": 0 };
   let headGirl = { "Priya": 0, "Anjali": 0 };
   let images = {
