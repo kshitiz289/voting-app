@@ -1,0 +1,85 @@
+body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f7f7f7;
+    }
+    header {
+      background: linear-gradient(to right, #2196F3, #4CAF50);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 26px;
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px white; }
+      to { text-shadow: 0 0 15px yellow; }
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    label, input, select {
+      display: block;
+      margin: 10px 0;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+    .candidates {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .candidate {
+      background: #eee;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+      text-align: center;
+      width: 160px;
+    }
+    .candidate img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0b7dda;
+    }
+    .admin-btn {
+      background: #d32f2f;
+    }
+    .admin-panel {
+      display: none;
+      text-align: center;
+    }
+    .hidden { display: none; }
+    .candidate-form {
+      background: #f0f0f0;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
