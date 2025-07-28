@@ -139,17 +139,17 @@
 
   <script>
     let adminPassword = "password";
-    let headBoy = { "Amarjeet Singh": 0, "Adarsh Verma": 0,"Riyansh Yadav":0,"Atharv Sharma":0,"Shaurya Saxena":0 };
-    let headGirl = { "Tarnija Singh": 0, "Shubhneet Kaur": 0,"Kashish Saxena":0 };
+    let headBoy = { "Amarjeet Singh": 0, "Adarsh Verma": 0, "Riyansh Yadav": 0, "Atharv Sharma": 0, "Shaurya Saxena": 0 };
+    let headGirl = { "Tarnija Singh": 0, "Shubhneet Kaur": 0, "Kashish Saxena": 0 };
     let images = {
       "Amarjeet Singh": "amarjeet.png",
-      "Adarsh Verma":"adarsh.png",
+      "Adarsh Verma": "adarsh.png",
       "Riyansh Yadav": "riyansh.png",
-      "Atharv Sharma":"atharv.png",
-      "Shaurya Saxena":"shaurya.png",
+      "Atharv Sharma": "atharv.png",
+      "Shaurya Saxena": "shaurya.png",
       "Tarnija Singh": "tarnija.png",
       "Shubhneet Kaur": "shubhneet.png",
-      "Kashish Saxena":"kashish.png"
+      "Kashish Saxena": "kashish.png"
     };
 
     let stage = "head_boy";
@@ -163,7 +163,7 @@
       for (const name in list) {
         const div = document.createElement("div");
         div.className = "candidate";
-        div.innerHTML = `<img src='${images[name]}'/><p>${name}</p><button onclick="vote('${name}')">Vote</button>`;
+        div.innerHTML = `<img src='${images[name]}' onerror="this.src='default.png'" /><p>${name}</p><button onclick="vote('${name}')">Vote</button>`;
         box.appendChild(div);
       }
       document.getElementById("stage-title").innerText = "Vote for " + (stage === "head_boy" ? "Head Boy" : "Head Girl");
@@ -185,17 +185,16 @@
         alert("Aadhaar must be 4 digits.");
         return;
       }
-      if (age < 11 ) {
+      if (age < 11) {
         alert("You must be at least 11 years old to vote.");
         return;
       }
       if (age > 20) {
-        alert("You are not elligibe to vote as your age is too high.");
+        alert("You are not eligible to vote as your age is too high.");
         return;
       }
-
       if (cls > 12) {
-        alert("There is no classes above 12");
+        alert("There is no class above 12.");
         return;
       }
 
@@ -299,9 +298,9 @@
       for (let i = 0; i < boyNames.length; i++) {
         const name = boyNames[i].value.trim();
         const file = boyImgs[i].files[0];
-        if (name && file) {
+        if (name) {
           headBoy[name] = 0;
-          images[name] = URL.createObjectURL(file);
+          images[name] = file ? URL.createObjectURL(file) : "default.png";
         }
       }
       const girlNames = document.querySelectorAll(".girl-name");
@@ -309,9 +308,9 @@
       for (let i = 0; i < girlNames.length; i++) {
         const name = girlNames[i].value.trim();
         const file = girlImgs[i].files[0];
-        if (name && file) {
+        if (name) {
           headGirl[name] = 0;
-          images[name] = URL.createObjectURL(file);
+          images[name] = file ? URL.createObjectURL(file) : "default.png";
         }
       }
       alert("Candidates updated!");
