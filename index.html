@@ -139,8 +139,18 @@
 
   <script>
     let adminPassword = "password";
-    let headBoy = { "Amarjeet Singh  (XI commerce)": 0, "Adarsh Verma  (XI science)": 0, "Riyansh Yadav  (XI science)": 0, "Atharv Sharma  (XI science)": 0, "Shaurya Saxena  (XI science)": 0 };
-    let headGirl = { "Tarnija Singh  (XI science)": 0, "Shubhneet Kaur  (XI science)": 0, "Kashish Saxena  (XI science)": 0 };
+    let headBoy = {
+      "Amarjeet Singh  (XI commerce)": 0,
+      "Adarsh Verma  (XI science)": 0,
+      "Riyansh Yadav  (XI science)": 0,
+      "Atharv Sharma  (XI science)": 0,
+      "Shaurya Saxena  (XI science)": 0
+    };
+    let headGirl = {
+      "Tarnija Singh  (XI science)": 0,
+      "Shubhneet Kaur  (XI science)": 0,
+      "Kashish Saxena  (XI science)": 0
+    };
     let images = {
       "Amarjeet Singh  (XI commerce)": "amarjeet.png",
       "Adarsh Verma  (XI science)": "adarsh.png",
@@ -163,7 +173,14 @@
       for (const name in list) {
         const div = document.createElement("div");
         div.className = "candidate";
-        div.innerHTML = `<img src='${images[name]}' onerror="this.src='default.png'" /><p>${name}</p><button onclick="vote('${name}')">Vote</button>`;
+
+        let [displayName, classInfo] = name.split("  (");
+        classInfo = classInfo ? "(" + classInfo : "";
+
+        div.innerHTML = `
+          <img src='${images[name]}' onerror="this.src='default.png'" />
+          <p><strong>${displayName}</strong><br>${classInfo}</p>
+          <button onclick="vote('${name}')">Vote</button>`;
         box.appendChild(div);
       }
       document.getElementById("stage-title").innerText = "Vote for " + (stage === "head_boy" ? "Head Boy" : "Head Girl");
