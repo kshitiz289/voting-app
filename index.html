@@ -39,6 +39,7 @@
     }
     .radio-group {
       display: flex;
+      flex-wrap: wrap;
       gap: 20px;
     }
     .candidates {
@@ -101,11 +102,12 @@
   <label>Age: <input id="age" type="number" /></label>
   <label>Aadhaar (last 4 digits): <input id="aadhaar" maxlength="4" /></label>
   <label>Class: <input id="class" /></label>
+
   <label>Section:</label>
-  <div class="radio-group">
-    <label><input type="radio" name="section" value="Shine" /> Shine</label>
-    <label><input type="radio" name="section" value="Bright" /> Bright</label>
+  <div class="radio-group" id="section-box">
+    <!-- dynamically filled -->
   </div>
+
   <label>Gender:</label>
   <div class="radio-group">
     <label><input type="radio" name="gender" value="Male" /> Male</label>
@@ -138,7 +140,7 @@
 </div>
 
 <script>
-  let adminPassword = "password";
+  let adminPassword = "tenge";
   let headBoy = {
     "Amarjeet Singh  (XI commerce)": 0,
     "Adarsh Verma  (XI science)": 0,
@@ -165,6 +167,30 @@
   let stage = "head_boy";
   let currentAadhaar = null;
   let votedAadhaars = new Set();
+
+  function updateSections() {
+    const cls = document.getElementById("class").value.trim();
+    const sectionBox = document.getElementById("section-box");
+    sectionBox.innerHTML = ""; // clear old
+
+    let sections = [];
+
+    if (cls === "8") {
+      sections = ["Shine", "Bright", "Glow"];
+    } else if (cls === "11" || cls === "12") {
+      sections = ["Science", "Commerce"];
+    } else {
+      sections = ["Shine", "Bright"];
+    }
+
+    sections.forEach(sec => {
+      const label = document.createElement("label");
+      label.innerHTML = `<input type="radio" name="section" value="${sec}" /> ${sec}`;
+      sectionBox.appendChild(label);
+    });
+  }
+
+  document.getElementById("class").addEventListener("input", updateSections);
 
   function saveToLocalStorage() {
     const data = {
@@ -226,7 +252,7 @@
       alert("Age must be between 11 and 20.");
       return;
     }
-    if (cls > 12) {
+    if (parseInt(cls) > 12) {
       alert("There is no class above 12.");
       return;
     }
@@ -254,6 +280,7 @@
       ["name", "age", "aadhaar", "class"].forEach(id => document.getElementById(id).value = "");
       document.querySelectorAll("input[name='section']").forEach(i => i.checked = false);
       document.querySelectorAll("input[name='gender']").forEach(i => i.checked = false);
+      updateSections();
       stage = "head_boy";
       buildCandidates();
     }
@@ -369,9 +396,9 @@
     document.getElementById("candidate-change-section").classList.add("hidden");
   }
 
-  // Load saved data and start
   loadFromLocalStorage();
   buildCandidates();
+  updateSections(); // call this at start
 </script>
 
 </body>
